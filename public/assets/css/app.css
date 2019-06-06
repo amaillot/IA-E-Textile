@@ -1,0 +1,46 @@
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+canvas {
+    display: none;
+}
+
+.container {
+    height: 100%;
+    display: flex;
+}
+
+.camera {
+    height: 100%;
+    width: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.camera #video {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.camera #startbutton {
+    position: absolute;
+    bottom: 20px;
+    background: transparent;
+    border: none;
+}
+
+.render {
+    height: 100%;
+    width: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FEFEFE;
+}
