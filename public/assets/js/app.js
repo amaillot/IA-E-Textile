@@ -13,4 +13,8 @@ $(document).ready(function() {
             $('.temperature').empty();
         });
     });
+
+    $('#startbutton').click(function() {
+       $('#photo').attr('src', 'assets/img/AlexisBlack.jpg');
+    });
 });

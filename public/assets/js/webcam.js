@@ -46,60 +46,62 @@
         canvas.height = height;
         canvas.getContext('2d').drawImage(video, 0, 0, width, height);
         var data = canvas.toDataURL('image/png');
-        basePhoto.setAttribute('src', data);
+        basePhoto.setAttribute('src', 'assets/img/AlexisBlanc.png');
+        photo.setAttribute('src', 'assets/img/AlexisBlack.jpg');
+
         let sketch = data;
-        $.ajax({
-            type: "POST",
-            url: "http://127.0.0.1:5000/getContours",
-            data: {
-                imgBase64: data
-            }
-        }).done(function( response ) {
-
-             console.log('return python : ' + response['sketch']);
-             mask.setAttribute('src', 'assets/img/' + response['sketch']);
-
-             imageToBase64('assets/img/' + response.sketch)
-                 .then(
-                     (sketch) => {
-                         imageToBase64('assets/img/' + response.hint)
-                             .then((hint) => {
-                                 let data = { 'sketch': sketch, 'hint': hint, 'opacity': 0.0 };
-                                 data = JSON.stringify(data);
-                                 $.ajax({
-                                     url: 'https://dvic.devinci.fr/dgx/paints_torch/api/v1/colorizer',
-                                     type: 'POST',
-                                     data: data,
-                                     contentType: 'application/json; charset=utf-8',
-                                     dataType: 'json',
-                                     success: function (res) {
-                                         console.log(res);
-                                         if ('colored' in res) {
-                                             let colored = res.colored;
-                                             console.log(colored);
-                                             photo.setAttribute('src', colored);
-                                             $.ajax({
-                                                 type: "POST",
-                                                url: "http://127.0.0.1:5000/mergePhotos",
-                                                data: {
-                                                    mergeImage: colored
-                                                }
-                                             }).done( (res) => {
-                                                 console.log('merge done');
-                                                 console.log(res);
-                                             })
-                                         }
-                                     },
-                                     error: function (error) {
-                                         console.log("error");
-                                         console.log(error);
-                                     }
-                         })
-
-                             });
-
-                     });
-         });
+        // $.ajax({
+        //     type: "POST",
+        //     url: "http://127.0.0.1:5000/getContours",
+        //     data: {
+        //         imgBase64: data
+        //     }
+        // }).done(function( response ) {
+        //
+        //      console.log('return python : ' + response['sketch']);
+        //      mask.setAttribute('src', 'assets/img/' + response['sketch']);
+        //      imageToBase64('assets/img/' + response.sketch)
+        //          .then(
+        //              (sketch) => {
+        //                  imageToBase64('assets/img/pngvide.png')
+        //                      .then((hint) => {
+        //                          let data = { 'sketch': sketch, 'hint': hint, 'opacity': 0.0 };
+        //                          data = JSON.stringify(data);
+        //                          $.ajax({
+        //                              url: 'https://dvic.devinci.fr/dgx/paints_torch/api/v1/colorizer',
+        //                              type: 'POST',
+        //                              data: data,
+        //                              contentType: 'application/json; charset=utf-8',
+        //                              dataType: 'json',
+        //                              success: function (res) {
+        //                                  console.log(res);
+        //                                  if ('colored' in res) {
+        //                                      let colored = res.colored;
+        //                                      console.log(colored);
+        //                                      //photo.setAttribute('src', colored);
+        //                                      $.ajax({
+        //                                          type: "POST",
+        //                                         url: "http://127.0.0.1:5000/mergePhotos",
+        //                                         data: {
+        //                                             mergeImage: colored
+        //                                         }
+        //                                      }).done( (res) => {
+        //                                          console.log('merge done');
+        //                                          console.log(res);
+        //                                         // photo.setAttribute('src', 'assets/img/'+res);
+        //                                      })
+        //                                  }
+        //                              },
+        //                              error: function (error) {
+        //                                  console.log("error");
+        //                                  console.log(error);
+        //                              }
+        //                  })
+        //
+        //                      });
+        //
+        //              });
+        //  });
     }
     startbutton.addEventListener('click', function(ev){
         takepicture();

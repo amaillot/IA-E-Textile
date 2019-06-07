@@ -82,15 +82,12 @@ def create_app(test_config=None):
         blank_image = np.zeros((height, width, 3), np.uint8)
         mask = get_mask(img)
 
-        contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        for contour in contours:
-            M = cv2.moments(contour)
-            if (M["m00"] != 0):
-                cX = int(M["m10"] / M["m00"])
-                cY = int(M["m01"] / M["m00"])
-                cv2.circle(blank_image, (cX, cY), 7, (0, 255, 0), -1)
+        #     M = cv2.moments(contour)
+        #     if (M["m00"] < 10 and M["m00"] != 0 and M["m00"] > 4):
+        #         cX = int(M["m10"] / M["m00"])
+        #         cY = int(M["m01"] / M["m00"])
+        #         cv2.circle(blank_image, (cX, cY), 1, (0, 255, 0), -1)
 
-            # cv2.drawContours(blank_image, contour, -1, (150, 150, 150), 3)
             # cv2.drawContours(img, contour, -1, (0, 255, 0), 3)
 
         #Create Sketch
@@ -102,6 +99,10 @@ def create_app(test_config=None):
         b, g, r = cv2.split(contour)
         rgba = [b, g, r, alpha]
         dst = cv2.merge(rgba, 4)
+
+        contours, _ = cv2.findContours(dst, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        for contour in contours:
+            cv2.drawContours(dst, contour, -1, (0, 0, 150), 3)
         cv2.imwrite("../public/assets/img/sketch.png", dst)
 
         # Create Hint
@@ -128,7 +129,7 @@ def data_uri_to_cv2_img(uri):
 def get_mask(img):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    sensitivity = 20
+    sensitivity = 80
     lower_white = np.array([0, 0, 255 - sensitivity])
     upper_white = np.array([255, sensitivity, 255])
 
