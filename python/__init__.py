@@ -4,7 +4,7 @@ import numpy as np
 import base64
 from flask_cors import CORS, cross_origin
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
 
 def create_app(test_config=None):
@@ -34,12 +34,49 @@ def create_app(test_config=None):
         data = request.form.get('imgBase64')
         return data
 
+    @app.route('/mergePhotos', methods=['GET', 'POST', 'DELETE'])
+    @cross_origin()
+    def mergePhotos():
+        mergeImage = request.form.get('mergeImage')
+        mergeImage = data_uri_to_cv2_img(mergeImage)
+
+        cv2.imwrite("mergeImageBase.png", mergeImage)
+        # maskMergeImage = get_mask(mergeImage)
+        # cv2.imwrite("maskMergeImage.png", maskMergeImage)
+        # openCvMergeImage = cv2.imread("maskMergeImage.png")
+
+        tmp = cv2.cvtColor(mergeImage, cv2.COLOR_BGR2GRAY)
+        _, alpha = cv2.threshold(tmp, 15, 255, cv2.THRESH_BINARY)
+        b, g, r = cv2.split(mergeImage)
+        rgba = [b, g, r, alpha]
+        dst = cv2.merge(rgba, 4)
+
+        cv2.imwrite("mergeImageAfterExtrudeBlack.png", dst)
+        l_img = cv2.imread("basePhoto.jpg")
+        x_offset = y_offset = 0
+        # l_img[y_offset:y_offset+s_img.shape[0], x_offset:x_offset+s_img.shape[1]] = s_img
+
+        s_img = cv2.imread("mergeImageAfterExtrudeBlack.png", -1)
+
+        # Merge 2 photos
+        y1, y2 = y_offset, y_offset + s_img.shape[0]
+        x1, x2 = x_offset, x_offset + s_img.shape[1]
+        alpha_s = s_img[:, :, 3] / 255.0
+        alpha_l = 1.0 - alpha_s
+        for c in range(0, 3):
+            l_img[y1:y2, x1:x2, c] = (alpha_s * s_img[:, :, c] +
+                                      alpha_l * l_img[y1:y2, x1:x2, c])
+
+        cv2.imwrite("../public/assets/img/merge.png", l_img)
+
+        return "merge.png"
+
     @app.route('/getContours', methods = ['GET', 'POST', 'DELETE'])
     @cross_origin()
     def getMask():
         data_uri = request.form.get('imgBase64')
         img = data_uri_to_cv2_img(data_uri)
-
+        cv2.imwrite("basePhoto.jpg", img)
         height, width, channels = img.shape
 
         blank_image = np.zeros((height, width, 3), np.uint8)
@@ -51,19 +88,34 @@ def create_app(test_config=None):
             if (M["m00"] != 0):
                 cX = int(M["m10"] / M["m00"])
                 cY = int(M["m01"] / M["m00"])
-                cv2.circle(blank_image, (cX, cY), 7, (150, 150, 150), -1)
+                cv2.circle(blank_image, (cX, cY), 7, (0, 255, 0), -1)
 
             # cv2.drawContours(blank_image, contour, -1, (150, 150, 150), 3)
-            cv2.drawContours(img, contour, -1, (0, 255, 0), 3)
+            # cv2.drawContours(img, contour, -1, (0, 255, 0), 3)
 
-        tmp = cv2.cvtColor(blank_image, cv2.COLOR_BGR2GRAY)
+        #Create Sketch
+        cv2.imwrite("mask.png", mask)
+        cv2.imwrite("hintTestColor.png", blank_image)
+        contour = cv2.imread("mask.png")
+        tmp = cv2.cvtColor(contour, cv2.COLOR_BGR2GRAY)
         _, alpha = cv2.threshold(tmp, 0, 255, cv2.THRESH_BINARY)
-        b, g, r = cv2.split(blank_image)
+        b, g, r = cv2.split(contour)
         rgba = [b, g, r, alpha]
         dst = cv2.merge(rgba, 4)
-        cv2.imwrite("../public/assets/img/test.png", dst)
-        print("test.png")
-        return 'test.png'
+        cv2.imwrite("../public/assets/img/sketch.png", dst)
+
+        # Create Hint
+        cv2.imwrite("maskHint.png", blank_image)
+        contour = cv2.imread("maskHint.png")
+        tmp = cv2.cvtColor(contour, cv2.COLOR_BGR2GRAY)
+        _, alpha = cv2.threshold(tmp, 0, 255, cv2.THRESH_BINARY)
+        b, g, r = cv2.split(contour)
+        rgba = [b, g, r, alpha]
+        dst = cv2.merge(rgba, 4)
+        cv2.imwrite("../public/assets/img/hint.png", dst)
+
+        data = {'sketch': 'sketch.png', 'hint': 'hint.png'}
+        return jsonify(data)
 
     return app
 
