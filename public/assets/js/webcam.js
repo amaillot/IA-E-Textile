@@ -48,80 +48,44 @@
         var data = canvas.toDataURL('image/png');
         basePhoto.setAttribute('src', data);
         let sketch = data;
-         $.ajax({
-                type: "POST",
-                url: "http://127.0.0.1:5000/getContours",
-                data: {
-                    imgBase64: data
-                }
-            }).done(function( response ) {
+        $.ajax({
+            type: "POST",
+            url: "http://127.0.0.1:5000/getContours",
+            data: {
+                imgBase64: data
+            }
+        }).done(function( response ) {
 
-             console.log('return python : ' + response);
-             mask.setAttribute('src', 'assets/img/' + response);
+            console.log('return python : ' + response);
+            mask.setAttribute('src', 'assets/img/' + response);
 
-             imageToBase64('assets/img/' + response)
-                 .then(
-                     (img64) => {
-                         let data = { 'sketch': sketch, 'hint': img64, 'opacity': 1 };
-                         data = JSON.stringify(data);
-                         $.ajax({
-                             url: 'https://dvic.devinci.fr/dgx/paints_torch/api/v1/colorizer',
-                             type: 'POST',
-                             data: data,
-                             contentType: 'application/json; charset=utf-8',
-                             dataType: 'json',
-                             success: function (res) {
-                                 //console.log(res);
-                                 if ('colored' in res) {
-                                     let colored = res.colored;
-                                     console.log(colored);
-                                     photo.setAttribute('src', colored);
-                                 }
-                             },
-                             error: function (error) {
-                                 console.log("error");
-                                 console.log(error);
-                             }
-                         })
-                     });
-         });
-        // $.ajax({
-        //     type: "POST",
-        //     url: "localhost:5000",
-        //     data: {
-        //        imgBase64: data
-        //     },
-        //     success: function(response){
-        //         var newData = {
-        //             "sketch"  : data,
-        //             "hint"    : response,
-        //             "opacity" : 0.0 /* Opcaity can vary from 0 to 1 */
-        //         }
-
-        //         $.ajax({
-        //             url         : 'https://dvic.devinci.fr/dgx/paints_torch/api/v1/colorizer',
-        //             type        : 'POST',
-        //             data        : newData,
-        //             contentType : 'application/json; charset=utf-8',
-        //             dataType    : 'json',
-        //             success     : function(response){
-        //                 console.log(response);
-        //                 if('colored' in response) {
-        //                     let colored = response.color;
-        //                     photo.setAttribute('src', colored);
-        //                 }
-        //             },
-        //             error       : function (error) {
-        //                 console.log("error");
-        //                 console.log(error);
-        //             }
-        //         })
-        //     },
-        //     error: function (error) {
-        //         console.log("error");
-        //         console.log(error);
-        //     }
-        // });
+            imageToBase64('assets/img/' + response)
+                .then(
+                    (img64) => {
+                        let data = { 'sketch': sketch, 'hint': img64, 'opacity': 1 };
+                        data = JSON.stringify(data);
+                        $.ajax({
+                            url: 'https://dvic.devinci.fr/dgx/paints_torch/api/v1/colorizer',
+                            type: 'POST',
+                            data: data,
+                            contentType: 'application/json; charset=utf-8',
+                            dataType: 'json',
+                            success: function (res) {
+                                //console.log(res);
+                                if ('colored' in res) {
+                                    let colored = res.colored;
+                                    console.log(colored);
+                                    photo.setAttribute('src', colored);
+                                }
+                            },
+                            error: function (error) {
+                                console.log("error");
+                                console.log(error);
+                            }
+                        })
+                    }
+                );
+        });
     }
 
     startbutton.addEventListener('click', function(ev){

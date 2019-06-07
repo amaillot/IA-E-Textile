@@ -11,18 +11,33 @@
     <div class="container">
         <div class="camera">
             <video id="video"></video>
-            <button id="startbutton"><img src="" alt="Take a picture"></button>
+            <button id="startbutton" disabled>Take picture</button>
         </div>
         <div class="render">
+            <label class="city-label">Entrez un nom de ville</label>
+            <input type="text" id="city-input">
+            <span class="temperature"></span>
             <canvas id="canvas"></canvas>
-            <img src="http://placekitten.com/g/320/261" id="basePhoto" alt="">
             <img src="http://placekitten.com/g/320/261" id="mask" alt="">
-            <img src="http://placekitten.com/g/320/261" id="photo" alt="photo">
+
+            <figure class="cd-image-container">
+                <img src="http://placehold.it/1000x1000" id="basePhoto" alt="Original Image">
+                <span class="cd-image-label" data-type="original">Original</span>
+
+                <div class="cd-resize-img"> <!-- the resizable image on top -->
+                    <img src="http://placehold.it/1000x1000" id="photo" alt="Modified Image">
+                    <span class="cd-image-label" data-type="modified">Modified</span>
+                </div>
+
+                <span class="cd-handle"></span>
+            </figure>
         </div>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
     <script src="node_modules/image-to-base64/image-to-base64.min.js"></script>
     <script src="assets/js/webcam.js"></script>
+    <script src="assets/js/comparison.js"></script>
+    <script src="assets/js/app.js"></script>
 </body>
 </html>
