@@ -12,6 +12,11 @@ canvas {
     display: flex;
 }
 
+#photo, #mask, #basePhoto {
+    height: 200px;
+    width: 200px;
+}
+
 .camera {
     height: 100%;
     width: 50%;

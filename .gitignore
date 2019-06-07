@@ -1,0 +1,6 @@
+.idea
+*/.idea
+public/node_modules
+instance
+*/instance
+__pychache__

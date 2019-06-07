@@ -4,6 +4,8 @@ import numpy as np
 cam = cv2.VideoCapture(0)
 while True:
     _, frame = cam.read()
+    print("frame : ")
+    print(frame)
     blurred_frame = cv2.GaussianBlur(frame, (5, 5), 0)
 
     hsv = cv2.cvtColor(blurred_frame, cv2.COLOR_BGR2HSV)
